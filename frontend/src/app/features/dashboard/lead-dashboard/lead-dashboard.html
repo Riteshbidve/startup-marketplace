@@ -1,0 +1,73 @@
+<section class="toolbar">
+  <div>
+    <p class="eyebrow">Founder dashboard</p>
+    <h1>Lead pipeline</h1>
+  </div>
+
+  <a routerLink="/dashboard/create-product">Create Product</a>
+</section>
+
+@if (success) {
+  <p class="success">{{ success }}</p>
+}
+
+@if (loading) {
+  <p class="state">Loading leads...</p>
+} @else if (error) {
+  <section class="empty">
+    <h2>{{ error }}</h2>
+    <p>Leads appear here after buyers request demos for your products.</p>
+    <a routerLink="/login">Go to login</a>
+  </section>
+} @else if (!leads.length) {
+  <section class="empty">
+    <h2>No leads yet</h2>
+    <p>When buyers request demos for your products, they will appear in this dashboard.</p>
+    <a routerLink="/products">View marketplace</a>
+  </section>
+} @else {
+  <section class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Buyer</th>
+          <th>Company</th>
+          <th>Budget</th>
+          <th>Urgency</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (lead of leads; track lead.id) {
+          <tr>
+            <td>
+              <strong>{{ lead.product_name }}</strong>
+              <span>{{ lead.email }}</span>
+            </td>
+            <td>
+              <strong>{{ lead.name }}</strong>
+              <span>{{ lead.buyer_username || 'Buyer account' }}</span>
+            </td>
+            <td>{{ lead.company_size }}</td>
+            <td>{{ lead.budget_range }}</td>
+            <td>
+              <span class="urgency">{{ lead.urgency_level }}</span>
+            </td>
+            <td>
+              <select
+                [ngModel]="lead.status"
+                (change)="updateStatus(lead, $event)"
+                [disabled]="updatingLeadId === lead.id"
+              >
+                @for (status of statuses; track status) {
+                  <option [value]="status">{{ status }}</option>
+                }
+              </select>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </section>
+}

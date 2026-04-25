@@ -5,7 +5,7 @@ from .views import LeadViewSet, ProductViewSet, RegisterView
 
 router = DefaultRouter()
 router.register(r'products', ProductViewSet)
-router.register(r'leads', LeadViewSet)
+router.register(r'leads', LeadViewSet, basename='lead')
 
 urlpatterns = [
     path('', include(router.urls)),

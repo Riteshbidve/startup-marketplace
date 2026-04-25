@@ -163,3 +163,155 @@ class AuthenticationApiTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertFalse(Lead.objects.filter(email='founder@example.com').exists())
+
+    def test_founder_sees_only_leads_for_their_products(self):
+        founder = get_user_model().objects.create_user(
+            username='visible_founder',
+            password='StrongPass123',
+            role='founder',
+        )
+        other_founder = get_user_model().objects.create_user(
+            username='hidden_founder',
+            password='StrongPass123',
+            role='founder',
+        )
+        buyer = get_user_model().objects.create_user(
+            username='lead_scope_buyer',
+            password='StrongPass123',
+            role='buyer',
+        )
+        visible_product = Product.objects.create(
+            founder=founder,
+            name='Visible Product',
+            description='Visible to owner.',
+            problem_statement='Owner should see this lead.',
+        )
+        hidden_product = Product.objects.create(
+            founder=other_founder,
+            name='Hidden Product',
+            description='Hidden from other founders.',
+            problem_statement='Other founders should not see this lead.',
+        )
+        Lead.objects.create(
+            product=visible_product,
+            buyer=buyer,
+            name='Visible Lead',
+            email='visible@example.com',
+            company_size='11-50',
+            budget_range='$2k-$10k',
+            urgency_level=4,
+        )
+        Lead.objects.create(
+            product=hidden_product,
+            buyer=buyer,
+            name='Hidden Lead',
+            email='hidden@example.com',
+            company_size='1-10',
+            budget_range='$500-$2k',
+            urgency_level=2,
+        )
+        self.client.force_authenticate(user=founder)
+
+        response = self.client.get('/api/leads/')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['email'], 'visible@example.com')
+        self.assertEqual(response.data[0]['product_name'], 'Visible Product')
+        self.assertEqual(response.data[0]['buyer_username'], 'lead_scope_buyer')
+
+    def test_buyer_sees_only_their_own_leads(self):
+        founder = get_user_model().objects.create_user(
+            username='buyer_scope_founder',
+            password='StrongPass123',
+            role='founder',
+        )
+        buyer = get_user_model().objects.create_user(
+            username='visible_buyer',
+            password='StrongPass123',
+            role='buyer',
+        )
+        other_buyer = get_user_model().objects.create_user(
+            username='hidden_buyer',
+            password='StrongPass123',
+            role='buyer',
+        )
+        product = Product.objects.create(
+            founder=founder,
+            name='Scoped Product',
+            description='A product with two buyer leads.',
+            problem_statement='Buyers should see their own lead only.',
+        )
+        Lead.objects.create(
+            product=product,
+            buyer=buyer,
+            name='Visible Buyer Lead',
+            email='buyer-visible@example.com',
+            company_size='51-200',
+            budget_range='$10k+',
+            urgency_level=5,
+        )
+        Lead.objects.create(
+            product=product,
+            buyer=other_buyer,
+            name='Hidden Buyer Lead',
+            email='buyer-hidden@example.com',
+            company_size='1-10',
+            budget_range='$0-$500',
+            urgency_level=1,
+        )
+        self.client.force_authenticate(user=buyer)
+
+        response = self.client.get('/api/leads/')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['email'], 'buyer-visible@example.com')
+
+    def test_founder_can_update_lead_status_only(self):
+        founder = get_user_model().objects.create_user(
+            username='status_founder',
+            password='StrongPass123',
+            role='founder',
+        )
+        buyer = get_user_model().objects.create_user(
+            username='status_buyer',
+            password='StrongPass123',
+            role='buyer',
+        )
+        product = Product.objects.create(
+            founder=founder,
+            name='Status Product',
+            description='A product with status updates.',
+            problem_statement='Founders need to manage lead status.',
+        )
+        lead = Lead.objects.create(
+            product=product,
+            buyer=buyer,
+            name='Status Lead',
+            email='status@example.com',
+            company_size='11-50',
+            budget_range='$2k-$10k',
+            urgency_level=4,
+        )
+        self.client.force_authenticate(user=founder)
+
+        response = self.client.patch(
+            f'/api/leads/{lead.id}/',
+            {'status': 'contacted'},
+            format='json',
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        lead.refresh_from_db()
+        self.assertEqual(lead.status, 'contacted')
+
+        blocked_response = self.client.patch(
+            f'/api/leads/{lead.id}/',
+            {'email': 'changed@example.com'},
+            format='json',
+        )
+
+        self.assertEqual(blocked_response.status_code, status.HTTP_403_FORBIDDEN)
+        lead.refresh_from_db()
+        self.assertEqual(lead.email, 'status@example.com')

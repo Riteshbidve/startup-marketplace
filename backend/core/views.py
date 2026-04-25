@@ -26,12 +26,31 @@ class ProductViewSet(viewsets.ModelViewSet):
 
 
 class LeadViewSet(viewsets.ModelViewSet):
-    queryset = Lead.objects.all().order_by('-created_at')
     serializer_class = LeadSerializer
     permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+
+        if user.role == 'founder':
+            return Lead.objects.filter(product__founder=user).order_by('-created_at')
+
+        return Lead.objects.filter(buyer=user).order_by('-created_at')
 
     def perform_create(self, serializer):
         if self.request.user.role != 'buyer':
             raise PermissionDenied('Only buyers can submit leads.')
 
         serializer.save(buyer=self.request.user)
+
+    def perform_update(self, serializer):
+        if self.request.user.role != 'founder':
+            raise PermissionDenied('Only founders can update lead status.')
+
+        serializer.save()
+
+    def partial_update(self, request, *args, **kwargs):
+        if set(request.data.keys()) - {'status'}:
+            raise PermissionDenied('Founders can update lead status only.')
+
+        return super().partial_update(request, *args, **kwargs)

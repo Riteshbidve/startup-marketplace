@@ -34,7 +34,10 @@ class ProductSerializer(serializers.ModelSerializer):
 
 
 class LeadSerializer(serializers.ModelSerializer):
+    product_name = serializers.CharField(source='product.name', read_only=True)
+    buyer_username = serializers.CharField(source='buyer.username', read_only=True)
+
     class Meta:
         model = Lead
         fields = '__all__'
-        read_only_fields = ['buyer', 'created_at', 'status']
+        read_only_fields = ['buyer', 'created_at', 'product_name', 'buyer_username']
