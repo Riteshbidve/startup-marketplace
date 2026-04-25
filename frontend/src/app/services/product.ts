@@ -18,6 +18,14 @@ export interface Product {
   created_at: string;
 }
 
+export interface CreateProductPayload {
+  name: string;
+  description: string;
+  problem_statement: string;
+  website_url?: string;
+  video_url?: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class ProductService {
   private readonly API = 'http://127.0.0.1:8000/api';
@@ -26,5 +34,9 @@ export class ProductService {
 
   getProducts() {
     return this.http.get<Product[]>(`${this.API}/products/`);
+  }
+
+  createProduct(data: CreateProductPayload) {
+    return this.http.post<Product>(`${this.API}/products/`, data);
   }
 }

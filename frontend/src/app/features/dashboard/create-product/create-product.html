@@ -1,0 +1,52 @@
+<section class="dashboard-layout">
+  <div class="intro">
+    <p class="eyebrow">Founder dashboard</p>
+    <h1>Create a product listing</h1>
+    <p>Add the problem, offer, and links buyers need to understand your startup.</p>
+  </div>
+
+  <form class="form" (ngSubmit)="submit()">
+    <label>
+      Product name
+      <input name="name" [(ngModel)]="form.name" required />
+    </label>
+
+    <label>
+      Description
+      <textarea name="description" rows="4" [(ngModel)]="form.description" required></textarea>
+    </label>
+
+    <label>
+      Problem statement
+      <textarea
+        name="problem_statement"
+        rows="4"
+        [(ngModel)]="form.problem_statement"
+        required
+      ></textarea>
+    </label>
+
+    <div class="field-grid">
+      <label>
+        Website URL
+        <input name="website_url" type="url" [(ngModel)]="form.website_url" />
+      </label>
+
+      <label>
+        Video URL
+        <input name="video_url" type="url" [(ngModel)]="form.video_url" />
+      </label>
+    </div>
+
+    @if (error) {
+      <p class="error">{{ error }}</p>
+    }
+
+    <div class="actions">
+      <a routerLink="/products">Cancel</a>
+      <button type="submit" [disabled]="loading">
+        {{ loading ? 'Creating...' : 'Create Product' }}
+      </button>
+    </div>
+  </form>
+</section>

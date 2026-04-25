@@ -3,6 +3,8 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
+from .models import Product
+
 
 class AuthenticationApiTests(APITestCase):
     def test_user_can_register_and_login(self):
@@ -49,3 +51,48 @@ class AuthenticationApiTests(APITestCase):
         authenticated_response = self.client.get('/api/products/')
 
         self.assertEqual(authenticated_response.status_code, status.HTTP_200_OK)
+
+    def test_founder_can_create_product_with_automatic_owner(self):
+        founder = get_user_model().objects.create_user(
+            username='founder_owner',
+            password='StrongPass123',
+            role='founder',
+        )
+        self.client.force_authenticate(user=founder)
+
+        response = self.client.post(
+            '/api/products/',
+            {
+                'name': 'TrustPilot for Startups',
+                'description': 'Collects buyer intent for early SaaS products.',
+                'problem_statement': 'Startups struggle to prove credibility before they have customers.',
+                'website_url': 'https://example.com',
+                'video_url': '',
+            },
+            format='json',
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        product = Product.objects.get(name='TrustPilot for Startups')
+        self.assertEqual(product.founder, founder)
+
+    def test_buyer_cannot_create_product(self):
+        buyer = get_user_model().objects.create_user(
+            username='buyer_creator',
+            password='StrongPass123',
+            role='buyer',
+        )
+        self.client.force_authenticate(user=buyer)
+
+        response = self.client.post(
+            '/api/products/',
+            {
+                'name': 'Buyer Product',
+                'description': 'This should not be allowed.',
+                'problem_statement': 'Buyers should submit leads, not products.',
+            },
+            format='json',
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertFalse(Product.objects.filter(name='Buyer Product').exists())
