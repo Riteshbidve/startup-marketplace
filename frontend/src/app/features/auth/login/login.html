@@ -1,0 +1,35 @@
+<section class="auth-panel">
+  <div class="intro">
+    <p class="eyebrow">Welcome back</p>
+    <h1>Login to your marketplace account</h1>
+    <p>Use your founder or buyer account to access protected product discovery.</p>
+  </div>
+
+  <form class="form" (ngSubmit)="submit()">
+    <label>
+      Username
+      <input name="username" [(ngModel)]="form.username" autocomplete="username" required />
+    </label>
+
+    <label>
+      Password
+      <input
+        name="password"
+        type="password"
+        [(ngModel)]="form.password"
+        autocomplete="current-password"
+        required
+      />
+    </label>
+
+    @if (error) {
+      <p class="error">{{ error }}</p>
+    }
+
+    <button type="submit" [disabled]="loading">
+      {{ loading ? 'Logging in...' : 'Login' }}
+    </button>
+
+    <p class="switch">New here? <a routerLink="/register">Create an account</a></p>
+  </form>
+</section>

@@ -1,0 +1,20 @@
+<header class="topbar">
+  <a class="brand" routerLink="/products">
+    <span class="brand-mark">SM</span>
+    <span>Startup Marketplace</span>
+  </a>
+
+  <nav class="nav">
+    <a routerLink="/products" routerLinkActive="active">Products</a>
+    @if (!auth.isLoggedIn()) {
+      <a routerLink="/login" routerLinkActive="active">Login</a>
+      <a class="button-link" routerLink="/register">Register</a>
+    } @else {
+      <button type="button" (click)="logout()">Logout</button>
+    }
+  </nav>
+</header>
+
+<main class="page">
+  <router-outlet />
+</main>
