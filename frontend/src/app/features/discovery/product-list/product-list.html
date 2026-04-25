@@ -7,6 +7,10 @@
   <a routerLink="/login">Login to refresh access</a>
 </section>
 
+@if (success) {
+  <p class="success">{{ success }}</p>
+}
+
 @if (loading) {
   <p class="state">Loading products...</p>
 } @else if (error) {
@@ -41,7 +45,17 @@
             }
           </div>
         }
+
+        <button type="button" (click)="openLeadForm(product)">Request Demo</button>
       </article>
     }
   </div>
+}
+
+@if (selectedProduct) {
+  <app-lead-form
+    [product]="selectedProduct"
+    (close)="closeLeadForm()"
+    (submitted)="handleLeadSubmitted()"
+  />
 }

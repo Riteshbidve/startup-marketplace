@@ -29,3 +29,9 @@ class LeadViewSet(viewsets.ModelViewSet):
     queryset = Lead.objects.all().order_by('-created_at')
     serializer_class = LeadSerializer
     permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        if self.request.user.role != 'buyer':
+            raise PermissionDenied('Only buyers can submit leads.')
+
+        serializer.save(buyer=self.request.user)

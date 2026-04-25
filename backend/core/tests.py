@@ -3,7 +3,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from .models import Product
+from .models import Lead, Product
 
 
 class AuthenticationApiTests(APITestCase):
@@ -96,3 +96,70 @@ class AuthenticationApiTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
         self.assertFalse(Product.objects.filter(name='Buyer Product').exists())
+
+    def test_buyer_can_submit_lead_with_automatic_owner(self):
+        founder = get_user_model().objects.create_user(
+            username='lead_founder',
+            password='StrongPass123',
+            role='founder',
+        )
+        product = Product.objects.create(
+            founder=founder,
+            name='Lead Capture Tool',
+            description='Captures buyer requests.',
+            problem_statement='Founders need qualified conversations.',
+        )
+        buyer = get_user_model().objects.create_user(
+            username='lead_buyer',
+            password='StrongPass123',
+            role='buyer',
+        )
+        self.client.force_authenticate(user=buyer)
+
+        response = self.client.post(
+            '/api/leads/',
+            {
+                'product': product.id,
+                'name': 'Ritesh Buyer',
+                'email': 'ritesh@example.com',
+                'company_size': '11-50',
+                'budget_range': '$2k-$10k',
+                'urgency_level': 4,
+            },
+            format='json',
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        lead = Lead.objects.get(email='ritesh@example.com')
+        self.assertEqual(lead.buyer, buyer)
+        self.assertEqual(lead.status, 'new')
+
+    def test_founder_cannot_submit_lead(self):
+        founder = get_user_model().objects.create_user(
+            username='blocked_lead_founder',
+            password='StrongPass123',
+            role='founder',
+        )
+        product = Product.objects.create(
+            founder=founder,
+            name='Founder Product',
+            description='A founder-owned product.',
+            problem_statement='Buyers should submit leads.',
+        )
+        self.client.force_authenticate(user=founder)
+
+        response = self.client.post(
+            '/api/leads/',
+            {
+                'product': product.id,
+                'name': 'Founder Lead',
+                'email': 'founder@example.com',
+                'company_size': '1-10',
+                'budget_range': '$500-$2k',
+                'urgency_level': 2,
+            },
+            format='json',
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertFalse(Lead.objects.filter(email='founder@example.com').exists())

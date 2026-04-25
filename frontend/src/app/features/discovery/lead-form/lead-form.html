@@ -1,0 +1,63 @@
+<div class="overlay">
+  <section class="panel" aria-label="Request demo form">
+    <header>
+      <div>
+        <p class="eyebrow">Request demo</p>
+        <h2>{{ product.name }}</h2>
+      </div>
+      <button class="icon-button" type="button" aria-label="Close" (click)="close.emit()">X</button>
+    </header>
+
+    <form (ngSubmit)="submit()">
+      <label>
+        Name
+        <input name="name" [(ngModel)]="form.name" autocomplete="name" required />
+      </label>
+
+      <label>
+        Email
+        <input name="email" type="email" [(ngModel)]="form.email" autocomplete="email" required />
+      </label>
+
+      <div class="field-grid">
+        <label>
+          Company size
+          <select name="company_size" [(ngModel)]="form.company_size" required>
+            <option value="">Select size</option>
+            <option value="1-10">1-10</option>
+            <option value="11-50">11-50</option>
+            <option value="51-200">51-200</option>
+            <option value="201+">201+</option>
+          </select>
+        </label>
+
+        <label>
+          Budget range
+          <select name="budget_range" [(ngModel)]="form.budget_range" required>
+            <option value="">Select budget</option>
+            <option value="$0-$500">$0-$500</option>
+            <option value="$500-$2k">$500-$2k</option>
+            <option value="$2k-$10k">$2k-$10k</option>
+            <option value="$10k+">$10k+</option>
+          </select>
+        </label>
+      </div>
+
+      <label>
+        Urgency level
+        <input name="urgency_level" type="number" min="1" max="5" [(ngModel)]="form.urgency_level" />
+      </label>
+
+      @if (error) {
+        <p class="error">{{ error }}</p>
+      }
+
+      <div class="actions">
+        <button class="secondary" type="button" (click)="close.emit()">Cancel</button>
+        <button type="submit" [disabled]="loading">
+          {{ loading ? 'Submitting...' : 'Submit Lead' }}
+        </button>
+      </div>
+    </form>
+  </section>
+</div>

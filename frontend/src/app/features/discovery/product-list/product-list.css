@@ -33,11 +33,20 @@ h1 {
 }
 
 .state,
-.empty {
+.empty,
+.success {
   background: #ffffff;
   border: 1px solid #e5e8ef;
   border-radius: 8px;
   padding: 28px;
+}
+
+.success {
+  background: #e8f3f0;
+  border-color: #b9ddd4;
+  color: #146c5f;
+  font-weight: 800;
+  margin-bottom: 18px;
 }
 
 .empty h2 {
@@ -101,6 +110,17 @@ h1 {
   font-size: 13px;
   font-weight: 700;
   padding: 6px 10px;
+}
+
+.product button {
+  background: #146c5f;
+  border: 0;
+  border-radius: 8px;
+  color: #ffffff;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 800;
+  padding: 12px 14px;
 }
 
 @media (max-width: 720px) {
