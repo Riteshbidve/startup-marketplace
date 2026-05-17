@@ -35,11 +35,12 @@ export class ProductService {
 
   constructor(private http: HttpClient) {}
 
-  getProducts(query?: string, sort?: string) {
+  getProducts(query?: string, sort?: string, tags?: number[]) {
     const q = (query || '').trim();
     const params: string[] = [];
     if (q) params.push(`search=${encodeURIComponent(q)}`);
     if (sort) params.push(`sort=${encodeURIComponent(sort)}`);
+    if (tags && tags.length) params.push(`tags=${tags.join(',')}`);
     const url = params.length ? `${this.API}/products/?${params.join('&')}` : `${this.API}/products/`;
     return this.http.get<Product[]>(url);
   }

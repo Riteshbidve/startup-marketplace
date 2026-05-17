@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { AuthService, RegisterPayload } from '../../../services/auth';
 
@@ -19,11 +19,17 @@ export class Register {
   };
   error = '';
   loading = false;
+  returnUrl = '/products';
 
   constructor(
     private auth: AuthService,
+    private route: ActivatedRoute,
     private router: Router,
   ) {}
+
+  ngOnInit() {
+    this.returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') || '/products';
+  }
 
   submit() {
     this.error = '';
@@ -32,7 +38,7 @@ export class Register {
     this.auth.register(this.form).subscribe({
       next: () => {
         this.loading = false;
-        this.router.navigate(['/login']);
+        this.router.navigate(['/login'], { queryParams: { returnUrl: this.returnUrl } });
       },
       error: () => {
         this.loading = false;

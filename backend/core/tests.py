@@ -168,6 +168,38 @@ class AuthenticationApiTests(APITestCase):
         self.assertEqual(response.data[0]['name'], 'Product B')
         self.assertEqual(response.data[0]['leads_count'], 2)
 
+    def test_product_filter_by_tags(self):
+        founder = get_user_model().objects.create_user(
+            username='tag_filter_founder',
+            password='StrongPass123',
+            role='founder',
+        )
+        self.client.force_authenticate(user=founder)
+
+        tag_a = Tag.objects.create(name='Onboarding')
+        tag_b = Tag.objects.create(name='Sales')
+
+        product_a = Product.objects.create(
+            founder=founder,
+            name='Onboarding Helper',
+            description='A',
+            problem_statement='A',
+        )
+        product_a.tags.add(tag_a)
+
+        product_b = Product.objects.create(
+            founder=founder,
+            name='Sales Helper',
+            description='B',
+            problem_statement='B',
+        )
+        product_b.tags.add(tag_b)
+
+        response = self.client.get(f'/api/products/?tags={tag_a.id}')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['name'], 'Onboarding Helper')
+
     def test_buyer_cannot_create_product(self):
         buyer = get_user_model().objects.create_user(
             username='buyer_creator',

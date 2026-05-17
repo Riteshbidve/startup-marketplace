@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 import { LeadForm } from '../lead-form/lead-form';
 import { Product, ProductService } from '../../../services/product';
+import { Tag, TagService } from '../../../services/tag';
 
 @Component({
   selector: 'app-product-list',
@@ -20,10 +22,33 @@ export class ProductList implements OnInit {
   query = '';
   sort: 'newest' | 'most_requested' = 'newest';
   private searchTimer: number | null = null;
+  tags: Tag[] = [];
+  selectedTagIds: number[] = [];
+  currentUrl = '/products';
 
-  constructor(private productService: ProductService) {}
+  constructor(
+    private productService: ProductService,
+    private tagService: TagService,
+    private route: ActivatedRoute,
+    private router: Router,
+  ) {}
 
   ngOnInit() {
+    this.currentUrl = this.router.url;
+
+    const qp = this.route.snapshot.queryParamMap;
+    this.query = qp.get('search') || '';
+    this.sort = (qp.get('sort') as any) === 'most_requested' ? 'most_requested' : 'newest';
+    this.selectedTagIds = (qp.get('tags') || '')
+      .split(',')
+      .map((part) => Number(part))
+      .filter((n) => Number.isFinite(n) && n > 0);
+
+    this.tagService.getTags().subscribe({
+      next: (tags) => (this.tags = tags),
+      error: () => (this.tags = []),
+    });
+
     this.loadProducts();
   }
 
@@ -32,7 +57,8 @@ export class ProductList implements OnInit {
     this.success = '';
     this.loading = true;
 
-    this.productService.getProducts('', this.sort === 'most_requested' ? 'most_requested' : '').subscribe({
+    const sortParam = this.sort === 'most_requested' ? 'most_requested' : '';
+    this.productService.getProducts(this.query, sortParam, this.selectedTagIds).subscribe({
       next: (products) => {
         this.allProducts = products;
         this.products = products;
@@ -58,12 +84,16 @@ export class ProductList implements OnInit {
       const q = this.query.trim();
       if (!q) {
         this.products = this.allProducts;
+        this.syncUrl();
         return;
       }
 
-      this.productService.getProducts(q).subscribe({
+      const sortParam = this.sort === 'most_requested' ? 'most_requested' : '';
+      this.productService.getProducts(q, sortParam, this.selectedTagIds).subscribe({
         next: (products) => {
           this.products = products;
+          this.allProducts = products;
+          this.syncUrl();
         },
         error: () => {
           // If backend search fails, keep the local filter results.
@@ -75,15 +105,42 @@ export class ProductList implements OnInit {
   onSortChange(value: string) {
     this.sort = value === 'most_requested' ? 'most_requested' : 'newest';
     const sortParam = this.sort === 'most_requested' ? 'most_requested' : '';
-    this.productService.getProducts(this.query, sortParam).subscribe({
+    this.productService.getProducts(this.query, sortParam, this.selectedTagIds).subscribe({
       next: (products) => {
         this.allProducts = products;
         this.applyLocalFilter();
+        this.syncUrl();
       },
       error: () => {
         // Leave current results as-is on error.
       },
     });
+  }
+
+  toggleTag(tagId: number) {
+    if (this.selectedTagIds.includes(tagId)) {
+      this.selectedTagIds = this.selectedTagIds.filter((id) => id !== tagId);
+    } else {
+      this.selectedTagIds = [...this.selectedTagIds, tagId];
+    }
+
+    const sortParam = this.sort === 'most_requested' ? 'most_requested' : '';
+    this.productService.getProducts(this.query, sortParam, this.selectedTagIds).subscribe({
+      next: (products) => {
+        this.allProducts = products;
+        this.applyLocalFilter();
+        this.syncUrl();
+      },
+      error: () => {},
+    });
+  }
+
+  clearFilters() {
+    this.query = '';
+    this.sort = 'newest';
+    this.selectedTagIds = [];
+    this.syncUrl();
+    this.loadProducts();
   }
 
   applyLocalFilter() {
@@ -114,5 +171,21 @@ export class ProductList implements OnInit {
   handleLeadSubmitted() {
     this.success = 'Lead submitted. The founder can now follow up with you.';
     this.selectedProduct = null;
+  }
+
+  private syncUrl() {
+    const queryParams: any = {};
+    const q = this.query.trim();
+    if (q) queryParams.search = q;
+    if (this.sort === 'most_requested') queryParams.sort = 'most_requested';
+    if (this.selectedTagIds.length) queryParams.tags = this.selectedTagIds.join(',');
+
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams,
+      replaceUrl: true,
+    });
+
+    this.currentUrl = this.router.url;
   }
 }

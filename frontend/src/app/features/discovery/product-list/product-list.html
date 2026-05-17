@@ -4,7 +4,7 @@
     <h1>Products solving real startup problems</h1>
   </div>
 
-  <a routerLink="/login">Login to refresh access</a>
+  <a routerLink="/login" [queryParams]="{ returnUrl: currentUrl }">Login to refresh access</a>
 </section>
 
 <section class="searchbar">
@@ -25,6 +25,24 @@
     </select>
   </label>
 </section>
+
+@if (tags.length) {
+  <section class="tagbar">
+    <div class="tagbar-row">
+      @for (tag of tags; track tag.id) {
+        <button
+          type="button"
+          class="tag-chip"
+          [attr.data-selected]="selectedTagIds.includes(tag.id)"
+          (click)="toggleTag(tag.id)"
+        >
+          {{ tag.name }}
+        </button>
+      }
+    </div>
+    <button class="clear" type="button" (click)="clearFilters()">Clear</button>
+  </section>
+}
 
 @if (success) {
   <p class="success">{{ success }}</p>

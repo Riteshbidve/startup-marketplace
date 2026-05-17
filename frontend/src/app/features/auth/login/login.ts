@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { AuthService } from '../../../services/auth';
 
@@ -17,11 +17,17 @@ export class Login {
   };
   error = '';
   loading = false;
+  returnUrl = '/products';
 
   constructor(
     private auth: AuthService,
+    private route: ActivatedRoute,
     private router: Router,
   ) {}
+
+  ngOnInit() {
+    this.returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') || '/products';
+  }
 
   submit() {
     this.error = '';
@@ -30,7 +36,7 @@ export class Login {
     this.auth.login(this.form).subscribe({
       next: () => {
         this.loading = false;
-        this.router.navigate(['/products']);
+        this.router.navigateByUrl(this.returnUrl);
       },
       error: () => {
         this.loading = false;

@@ -4,9 +4,12 @@ from rest_framework.generics import CreateAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.db.models import Q
 from django.db.models import Count
+from rest_framework import mixins
+from rest_framework.viewsets import GenericViewSet
 
 from .models import Lead, Product, User
-from .serializers import LeadSerializer, ProductSerializer, RegisterSerializer
+from .models import Tag
+from .serializers import LeadSerializer, ProductSerializer, RegisterSerializer, TagSerializer
 
 
 class RegisterView(CreateAPIView):
@@ -22,6 +25,17 @@ class ProductViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset().annotate(leads_count=Count('leads'))
+
+        tag_ids = (self.request.query_params.get('tags') or '').strip()
+        if tag_ids:
+            try:
+                ids = [int(part) for part in tag_ids.split(',') if part.strip()]
+            except ValueError:
+                ids = []
+
+            if ids:
+                queryset = queryset.filter(tags__id__in=ids).distinct()
+
         query = (
             self.request.query_params.get('search')
             or self.request.query_params.get('q')
@@ -50,6 +64,12 @@ class ProductViewSet(viewsets.ModelViewSet):
             raise PermissionDenied('Only founders can create products.')
 
         serializer.save(founder=self.request.user)
+
+
+class TagViewSet(mixins.ListModelMixin, GenericViewSet):
+    queryset = Tag.objects.all().order_by('name')
+    serializer_class = TagSerializer
+    permission_classes = [IsAuthenticated]
 
 
 class LeadViewSet(viewsets.ModelViewSet):
