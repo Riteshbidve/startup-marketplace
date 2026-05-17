@@ -46,7 +46,9 @@
     @for (product of products; track product.id) {
       <article class="product">
         <div>
-          <h2>{{ product.name }}</h2>
+          <h2>
+            <a class="product-link" [routerLink]="['/products', product.id]">{{ product.name }}</a>
+          </h2>
           <p>{{ product.description }}</p>
         </div>
 

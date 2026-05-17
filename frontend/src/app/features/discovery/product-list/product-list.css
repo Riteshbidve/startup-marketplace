@@ -95,6 +95,15 @@ h1 {
   margin: 0 0 8px;
 }
 
+.product-link {
+  color: #172033;
+  text-decoration: none;
+}
+
+.product-link:hover {
+  text-decoration: underline;
+}
+
 .product p {
   color: #647089;
   margin: 0;

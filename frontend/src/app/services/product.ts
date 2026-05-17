@@ -40,6 +40,10 @@ export class ProductService {
     return this.http.get<Product[]>(url);
   }
 
+  getProduct(id: number) {
+    return this.http.get<Product>(`${this.API}/products/${id}/`);
+  }
+
   createProduct(data: CreateProductPayload) {
     return this.http.post<Product>(`${this.API}/products/`, data);
   }

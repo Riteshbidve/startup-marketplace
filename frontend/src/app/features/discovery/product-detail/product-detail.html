@@ -1,0 +1,68 @@
+<a class="back" routerLink="/products">Back to products</a>
+
+@if (loading) {
+  <p class="state">Loading product...</p>
+} @else if (error) {
+  <section class="empty">
+    <h2>{{ error }}</h2>
+    <a routerLink="/products">Go to products</a>
+  </section>
+} @else if (product) {
+  <header class="hero">
+    <div>
+      <p class="eyebrow">Product</p>
+      <h1>{{ product.name }}</h1>
+      <p class="summary">{{ product.description }}</p>
+    </div>
+
+    <div class="actions">
+      <button type="button" (click)="openLeadForm()">Request Demo</button>
+      @if (product.website_url) {
+        <a class="secondary" [href]="product.website_url" target="_blank" rel="noopener">Website</a>
+      }
+      @if (product.video_url) {
+        <a class="secondary" [href]="product.video_url" target="_blank" rel="noopener">Demo video</a>
+      }
+    </div>
+  </header>
+
+  @if (success) {
+    <p class="success">{{ success }}</p>
+  }
+
+  <section class="grid">
+    <article class="card">
+      <h2>Problem</h2>
+      <p>{{ product.problem_statement }}</p>
+    </article>
+
+    <article class="card">
+      <h2>Founder</h2>
+      <p class="founder">{{ product.founder_username }}</p>
+      @if (product.founder_linkedin_profile) {
+        <a [href]="product.founder_linkedin_profile" target="_blank" rel="noopener">LinkedIn profile</a>
+      } @else {
+        <p class="muted">No LinkedIn profile shared yet.</p>
+      }
+    </article>
+
+    @if (product.tags.length) {
+      <article class="card">
+        <h2>Tags</h2>
+        <div class="tags">
+          @for (tag of product.tags; track tag.id) {
+            <span>{{ tag.name }}</span>
+          }
+        </div>
+      </article>
+    }
+  </section>
+
+  @if (showLeadForm) {
+    <app-lead-form
+      [product]="product"
+      (close)="closeLeadForm()"
+      (submitted)="handleLeadSubmitted()"
+    />
+  }
+}

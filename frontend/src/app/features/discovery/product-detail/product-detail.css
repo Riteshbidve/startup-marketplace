@@ -1,0 +1,152 @@
+.back {
+  color: #146c5f;
+  display: inline-flex;
+  font-weight: 900;
+  margin-bottom: 16px;
+  text-decoration: none;
+}
+
+.state,
+.empty,
+.success {
+  background: #ffffff;
+  border: 1px solid #e5e8ef;
+  border-radius: 8px;
+  padding: 28px;
+}
+
+.success {
+  background: #e8f3f0;
+  border-color: #b9ddd4;
+  color: #146c5f;
+  font-weight: 900;
+  margin: 18px 0;
+}
+
+.empty a {
+  background: #172033;
+  border-radius: 8px;
+  color: #ffffff;
+  display: inline-flex;
+  font-weight: 900;
+  margin-top: 16px;
+  padding: 11px 14px;
+  text-decoration: none;
+}
+
+.hero {
+  align-items: flex-start;
+  display: flex;
+  gap: 22px;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.eyebrow {
+  color: #146c5f;
+  font-size: 13px;
+  font-weight: 900;
+  margin: 0 0 10px;
+  text-transform: uppercase;
+}
+
+h1 {
+  font-size: 40px;
+  line-height: 1.08;
+  margin: 0 0 14px;
+  max-width: 680px;
+}
+
+.summary {
+  color: #647089;
+  font-size: 17px;
+  line-height: 1.5;
+  margin: 0;
+  max-width: 680px;
+}
+
+.actions {
+  display: grid;
+  gap: 10px;
+  min-width: 220px;
+}
+
+.actions button,
+.actions a {
+  border-radius: 8px;
+  font: inherit;
+  font-weight: 900;
+  padding: 12px 14px;
+  text-align: center;
+  text-decoration: none;
+}
+
+.actions button {
+  background: #146c5f;
+  border: 0;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.actions .secondary {
+  background: #172033;
+  color: #ffffff;
+}
+
+.grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.card {
+  background: #ffffff;
+  border: 1px solid #e5e8ef;
+  border-radius: 8px;
+  display: grid;
+  gap: 10px;
+  padding: 22px;
+}
+
+.card h2 {
+  margin: 0;
+}
+
+.card p {
+  color: #647089;
+  margin: 0;
+}
+
+.founder {
+  color: #172033;
+  font-weight: 900;
+}
+
+.muted {
+  color: #647089;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tags span {
+  background: #e8f3f0;
+  border-radius: 999px;
+  color: #146c5f;
+  font-size: 13px;
+  font-weight: 800;
+  padding: 6px 10px;
+}
+
+@media (max-width: 720px) {
+  .hero {
+    flex-direction: column;
+  }
+
+  .actions {
+    width: 100%;
+  }
+}
