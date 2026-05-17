@@ -76,6 +76,32 @@ class AuthenticationApiTests(APITestCase):
         product = Product.objects.get(name='TrustPilot for Startups')
         self.assertEqual(product.founder, founder)
 
+    def test_product_search_filters_by_problem(self):
+        founder = get_user_model().objects.create_user(
+            username='search_founder',
+            password='StrongPass123',
+            role='founder',
+        )
+        self.client.force_authenticate(user=founder)
+
+        Product.objects.create(
+            founder=founder,
+            name='Analytics Tool',
+            description='Something else',
+            problem_statement='Helps startups understand churn',
+        )
+        Product.objects.create(
+            founder=founder,
+            name='Sales Tool',
+            description='Something else',
+            problem_statement='Automates cold outreach',
+        )
+
+        response = self.client.get('/api/products/?q=churn')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['name'], 'Analytics Tool')
+
     def test_buyer_cannot_create_product(self):
         buyer = get_user_model().objects.create_user(
             username='buyer_creator',
@@ -133,6 +159,7 @@ class AuthenticationApiTests(APITestCase):
         lead = Lead.objects.get(email='ritesh@example.com')
         self.assertEqual(lead.buyer, buyer)
         self.assertEqual(lead.status, 'new')
+        self.assertEqual(response.data['lead_tier'], 'warm')
 
     def test_founder_cannot_submit_lead(self):
         founder = get_user_model().objects.create_user(

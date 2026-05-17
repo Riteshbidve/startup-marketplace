@@ -7,6 +7,17 @@
   <a routerLink="/login">Login to refresh access</a>
 </section>
 
+<section class="searchbar">
+  <label class="search-label">
+    Search by problem
+    <input
+      [value]="query"
+      (input)="onQueryChange(($any($event.target)).value)"
+      placeholder="e.g. churn, onboarding, lead qualification..."
+    />
+  </label>
+</section>
+
 @if (success) {
   <p class="success">{{ success }}</p>
 }
@@ -21,8 +32,14 @@
   </section>
 } @else if (!products.length) {
   <section class="empty">
-    <h2>No products yet</h2>
-    <p>The API is connected. Add products in Django admin and they will appear here.</p>
+    <h2>{{ query.trim() ? 'No products found' : 'No products yet' }}</h2>
+    <p>
+      {{
+        query.trim()
+          ? 'Try a different keyword. Search matches the problem statement, name, and description.'
+          : 'The API is connected. Add products in Django admin and they will appear here.'
+      }}
+    </p>
   </section>
 } @else {
   <div class="grid">
@@ -36,6 +53,18 @@
         <div class="problem">
           <span>Problem</span>
           <p>{{ product.problem_statement }}</p>
+        </div>
+
+        <div class="trust">
+          <span class="trust-label">Founder</span>
+          <div class="trust-row">
+            <span class="trust-name">{{ product.founder_username }}</span>
+            @if (product.founder_linkedin_profile) {
+              <a class="trust-link" [href]="product.founder_linkedin_profile" target="_blank" rel="noopener"
+                >LinkedIn</a
+              >
+            }
+          </div>
         </div>
 
         @if (product.tags.length) {

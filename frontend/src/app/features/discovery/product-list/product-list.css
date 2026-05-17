@@ -64,6 +64,24 @@ h1 {
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
 }
 
+.searchbar {
+  margin-bottom: 18px;
+}
+
+.search-label {
+  color: #334058;
+  display: grid;
+  font-weight: 800;
+  gap: 8px;
+}
+
+.search-label input {
+  border: 1px solid #cbd2df;
+  border-radius: 8px;
+  font: inherit;
+  padding: 12px;
+}
+
 .product {
   background: #ffffff;
   border: 1px solid #e5e8ef;
@@ -110,6 +128,39 @@ h1 {
   font-size: 13px;
   font-weight: 700;
   padding: 6px 10px;
+}
+
+.trust {
+  background: #f7f8fb;
+  border-radius: 8px;
+  padding: 14px;
+}
+
+.trust-label {
+  color: #647089;
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 800;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+.trust-row {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+}
+
+.trust-name {
+  color: #172033;
+  font-weight: 800;
+}
+
+.trust-link {
+  color: #146c5f;
+  font-weight: 800;
+  text-decoration: none;
 }
 
 .product button {

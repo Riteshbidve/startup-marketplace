@@ -67,7 +67,7 @@ h1 {
 
 table {
   border-collapse: collapse;
-  min-width: 860px;
+  min-width: 980px;
   width: 100%;
 }
 
@@ -106,6 +106,29 @@ td span {
   justify-content: center;
   margin-top: 0;
   width: 32px;
+}
+
+.score {
+  border-radius: 999px;
+  display: inline-flex;
+  font-size: 13px;
+  font-weight: 900;
+  padding: 6px 10px;
+}
+
+.score[data-tier='hot'] {
+  background: #ffe4e8;
+  color: #b42318;
+}
+
+.score[data-tier='warm'] {
+  background: #fff4d6;
+  color: #8a4b00;
+}
+
+.score[data-tier='low'] {
+  background: #e8f3f0;
+  color: #146c5f;
 }
 
 select {

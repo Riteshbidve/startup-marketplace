@@ -11,11 +11,14 @@ import { Product, ProductService } from '../../../services/product';
   styleUrl: './product-list.css',
 })
 export class ProductList implements OnInit {
+  allProducts: Product[] = [];
   products: Product[] = [];
   error = '';
   loading = true;
   selectedProduct: Product | null = null;
   success = '';
+  query = '';
+  private searchTimer: number | null = null;
 
   constructor(private productService: ProductService) {}
 
@@ -30,6 +33,7 @@ export class ProductList implements OnInit {
 
     this.productService.getProducts().subscribe({
       next: (products) => {
+        this.allProducts = products;
         this.products = products;
         this.loading = false;
       },
@@ -37,6 +41,49 @@ export class ProductList implements OnInit {
         this.loading = false;
         this.error = error.status === 401 ? 'Login to view products.' : 'Could not load products.';
       },
+    });
+  }
+
+  onQueryChange(value: string) {
+    this.query = value;
+    this.applyLocalFilter();
+
+    if (this.searchTimer) {
+      window.clearTimeout(this.searchTimer);
+    }
+
+    // Lightweight debounce so we can also use the backend search without spamming requests.
+    this.searchTimer = window.setTimeout(() => {
+      const q = this.query.trim();
+      if (!q) {
+        this.products = this.allProducts;
+        return;
+      }
+
+      this.productService.getProducts(q).subscribe({
+        next: (products) => {
+          this.products = products;
+        },
+        error: () => {
+          // If backend search fails, keep the local filter results.
+        },
+      });
+    }, 250);
+  }
+
+  applyLocalFilter() {
+    const q = this.query.trim().toLowerCase();
+    if (!q) {
+      this.products = this.allProducts;
+      return;
+    }
+
+    this.products = this.allProducts.filter((product) => {
+      return (
+        product.problem_statement.toLowerCase().includes(q) ||
+        product.name.toLowerCase().includes(q) ||
+        product.description.toLowerCase().includes(q)
+      );
     });
   }
 

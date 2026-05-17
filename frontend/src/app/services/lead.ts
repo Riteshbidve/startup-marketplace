@@ -22,6 +22,8 @@ export interface Lead {
   budget_range: string;
   urgency_level: number;
   status: 'new' | 'contacted' | 'converted' | 'rejected';
+  lead_score: number;
+  lead_tier: 'hot' | 'warm' | 'low';
   created_at: string;
 }
 

@@ -2,6 +2,7 @@ from rest_framework import viewsets
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.generics import CreateAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from django.db.models import Q
 
 from .models import Lead, Product, User
 from .serializers import LeadSerializer, ProductSerializer, RegisterSerializer
@@ -17,6 +18,18 @@ class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all().order_by('-created_at')
     serializer_class = ProductSerializer
     permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        query = (self.request.query_params.get('q') or '').strip()
+        if not query:
+            return queryset
+
+        return queryset.filter(
+            Q(problem_statement__icontains=query)
+            | Q(name__icontains=query)
+            | Q(description__icontains=query)
+        )
 
     def perform_create(self, serializer):
         if self.request.user.role != 'founder':

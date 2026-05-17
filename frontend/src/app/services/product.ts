@@ -9,6 +9,8 @@ export interface Tag {
 export interface Product {
   id: number;
   founder: number;
+  founder_username: string;
+  founder_linkedin_profile?: string | null;
   name: string;
   description: string;
   problem_statement: string;
@@ -32,8 +34,10 @@ export class ProductService {
 
   constructor(private http: HttpClient) {}
 
-  getProducts() {
-    return this.http.get<Product[]>(`${this.API}/products/`);
+  getProducts(query?: string) {
+    const q = (query || '').trim();
+    const url = q ? `${this.API}/products/?q=${encodeURIComponent(q)}` : `${this.API}/products/`;
+    return this.http.get<Product[]>(url);
   }
 
   createProduct(data: CreateProductPayload) {
