@@ -21,7 +21,11 @@ class ProductViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        query = (self.request.query_params.get('q') or '').strip()
+        query = (
+            self.request.query_params.get('search')
+            or self.request.query_params.get('q')
+            or ''
+        ).strip()
         if not query:
             return queryset
 
@@ -29,7 +33,8 @@ class ProductViewSet(viewsets.ModelViewSet):
             Q(problem_statement__icontains=query)
             | Q(name__icontains=query)
             | Q(description__icontains=query)
-        )
+            | Q(tags__name__icontains=query)
+        ).distinct()
 
     def perform_create(self, serializer):
         if self.request.user.role != 'founder':

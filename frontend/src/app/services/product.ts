@@ -36,7 +36,7 @@ export class ProductService {
 
   getProducts(query?: string) {
     const q = (query || '').trim();
-    const url = q ? `${this.API}/products/?q=${encodeURIComponent(q)}` : `${this.API}/products/`;
+    const url = q ? `${this.API}/products/?search=${encodeURIComponent(q)}` : `${this.API}/products/`;
     return this.http.get<Product[]>(url);
   }
 

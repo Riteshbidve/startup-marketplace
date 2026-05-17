@@ -3,7 +3,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from .models import Lead, Product
+from .models import Lead, Product, Tag
 
 
 class AuthenticationApiTests(APITestCase):
@@ -84,7 +84,7 @@ class AuthenticationApiTests(APITestCase):
         )
         self.client.force_authenticate(user=founder)
 
-        Product.objects.create(
+        product_a = Product.objects.create(
             founder=founder,
             name='Analytics Tool',
             description='Something else',
@@ -97,10 +97,18 @@ class AuthenticationApiTests(APITestCase):
             problem_statement='Automates cold outreach',
         )
 
-        response = self.client.get('/api/products/?q=churn')
+        response = self.client.get('/api/products/?search=churn')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data[0]['name'], 'Analytics Tool')
+
+        # Tag search also works.
+        tag = Tag.objects.create(name='Retention')
+        product_a.tags.add(tag)
+        tag_response = self.client.get('/api/products/?search=retention')
+        self.assertEqual(tag_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(tag_response.data), 1)
+        self.assertEqual(tag_response.data[0]['name'], 'Analytics Tool')
 
     def test_buyer_cannot_create_product(self):
         buyer = get_user_model().objects.create_user(
