@@ -18,6 +18,7 @@ export class ProductList implements OnInit {
   selectedProduct: Product | null = null;
   success = '';
   query = '';
+  sort: 'newest' | 'most_requested' = 'newest';
   private searchTimer: number | null = null;
 
   constructor(private productService: ProductService) {}
@@ -31,7 +32,7 @@ export class ProductList implements OnInit {
     this.success = '';
     this.loading = true;
 
-    this.productService.getProducts().subscribe({
+    this.productService.getProducts('', this.sort === 'most_requested' ? 'most_requested' : '').subscribe({
       next: (products) => {
         this.allProducts = products;
         this.products = products;
@@ -69,6 +70,20 @@ export class ProductList implements OnInit {
         },
       });
     }, 250);
+  }
+
+  onSortChange(value: string) {
+    this.sort = value === 'most_requested' ? 'most_requested' : 'newest';
+    const sortParam = this.sort === 'most_requested' ? 'most_requested' : '';
+    this.productService.getProducts(this.query, sortParam).subscribe({
+      next: (products) => {
+        this.allProducts = products;
+        this.applyLocalFilter();
+      },
+      error: () => {
+        // Leave current results as-is on error.
+      },
+    });
   }
 
   applyLocalFilter() {

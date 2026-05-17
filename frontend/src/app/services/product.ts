@@ -17,6 +17,7 @@ export interface Product {
   website_url?: string | null;
   video_url?: string | null;
   tags: Tag[];
+  leads_count: number;
   created_at: string;
 }
 
@@ -34,9 +35,12 @@ export class ProductService {
 
   constructor(private http: HttpClient) {}
 
-  getProducts(query?: string) {
+  getProducts(query?: string, sort?: string) {
     const q = (query || '').trim();
-    const url = q ? `${this.API}/products/?search=${encodeURIComponent(q)}` : `${this.API}/products/`;
+    const params: string[] = [];
+    if (q) params.push(`search=${encodeURIComponent(q)}`);
+    if (sort) params.push(`sort=${encodeURIComponent(sort)}`);
+    const url = params.length ? `${this.API}/products/?${params.join('&')}` : `${this.API}/products/`;
     return this.http.get<Product[]>(url);
   }
 

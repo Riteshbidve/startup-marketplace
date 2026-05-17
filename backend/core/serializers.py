@@ -29,6 +29,7 @@ class ProductSerializer(serializers.ModelSerializer):
     tags = TagSerializer(many=True, read_only=True)
     founder_username = serializers.CharField(source='founder.username', read_only=True)
     founder_linkedin_profile = serializers.URLField(source='founder.linkedin_profile', read_only=True, allow_null=True)
+    leads_count = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Product

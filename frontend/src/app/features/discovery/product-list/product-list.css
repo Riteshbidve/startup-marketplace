@@ -65,6 +65,10 @@ h1 {
 }
 
 .searchbar {
+  align-items: end;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 1fr 220px;
   margin-bottom: 18px;
 }
 
@@ -76,6 +80,20 @@ h1 {
 }
 
 .search-label input {
+  border: 1px solid #cbd2df;
+  border-radius: 8px;
+  font: inherit;
+  padding: 12px;
+}
+
+.sort-label {
+  color: #334058;
+  display: grid;
+  font-weight: 800;
+  gap: 8px;
+}
+
+.sort-label select {
   border: 1px solid #cbd2df;
   border-radius: 8px;
   font: inherit;
@@ -172,6 +190,20 @@ h1 {
   text-decoration: none;
 }
 
+.meta {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.meta-pill {
+  background: #f1f3f7;
+  border-radius: 999px;
+  color: #334058;
+  font-size: 13px;
+  font-weight: 900;
+  padding: 6px 10px;
+}
+
 .product button {
   background: #146c5f;
   border: 0;
@@ -187,5 +219,9 @@ h1 {
   .toolbar {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .searchbar {
+    grid-template-columns: 1fr;
   }
 }

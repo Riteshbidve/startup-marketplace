@@ -16,6 +16,14 @@
       placeholder="e.g. churn, onboarding, lead qualification..."
     />
   </label>
+
+  <label class="sort-label">
+    Sort
+    <select [value]="sort" (change)="onSortChange(($any($event.target)).value)">
+      <option value="newest">Newest</option>
+      <option value="most_requested">Most requested</option>
+    </select>
+  </label>
 </section>
 
 @if (success) {
@@ -67,6 +75,10 @@
               >
             }
           </div>
+        </div>
+
+        <div class="meta">
+          <span class="meta-pill">{{ product.leads_count }} requests</span>
         </div>
 
         @if (product.tags.length) {

@@ -110,6 +110,64 @@ class AuthenticationApiTests(APITestCase):
         self.assertEqual(len(tag_response.data), 1)
         self.assertEqual(tag_response.data[0]['name'], 'Analytics Tool')
 
+    def test_product_sort_most_requested(self):
+        founder = get_user_model().objects.create_user(
+            username='sort_founder',
+            password='StrongPass123',
+            role='founder',
+        )
+        buyer = get_user_model().objects.create_user(
+            username='sort_buyer',
+            password='StrongPass123',
+            role='buyer',
+        )
+        self.client.force_authenticate(user=founder)
+
+        product_a = Product.objects.create(
+            founder=founder,
+            name='Product A',
+            description='A',
+            problem_statement='A',
+        )
+        product_b = Product.objects.create(
+            founder=founder,
+            name='Product B',
+            description='B',
+            problem_statement='B',
+        )
+        Lead.objects.create(
+            product=product_b,
+            buyer=buyer,
+            name='Buyer 1',
+            email='b1@example.com',
+            company_size='11-50',
+            budget_range='$2k-$10k',
+            urgency_level=3,
+        )
+        Lead.objects.create(
+            product=product_b,
+            buyer=buyer,
+            name='Buyer 2',
+            email='b2@example.com',
+            company_size='11-50',
+            budget_range='$2k-$10k',
+            urgency_level=3,
+        )
+        Lead.objects.create(
+            product=product_a,
+            buyer=buyer,
+            name='Buyer 3',
+            email='a1@example.com',
+            company_size='11-50',
+            budget_range='$2k-$10k',
+            urgency_level=3,
+        )
+
+        response = self.client.get('/api/products/?sort=most_requested')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data[0]['name'], 'Product B')
+        self.assertEqual(response.data[0]['leads_count'], 2)
+
     def test_buyer_cannot_create_product(self):
         buyer = get_user_model().objects.create_user(
             username='buyer_creator',

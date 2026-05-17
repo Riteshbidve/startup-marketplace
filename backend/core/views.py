@@ -3,6 +3,7 @@ from rest_framework.exceptions import PermissionDenied
 from rest_framework.generics import CreateAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.db.models import Q
+from django.db.models import Count
 
 from .models import Lead, Product, User
 from .serializers import LeadSerializer, ProductSerializer, RegisterSerializer
@@ -20,21 +21,29 @@ class ProductViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        queryset = super().get_queryset().annotate(leads_count=Count('leads'))
         query = (
             self.request.query_params.get('search')
             or self.request.query_params.get('q')
             or ''
         ).strip()
         if not query:
-            return queryset
+            return self._apply_sort(queryset)
 
-        return queryset.filter(
+        filtered = queryset.filter(
             Q(problem_statement__icontains=query)
             | Q(name__icontains=query)
             | Q(description__icontains=query)
             | Q(tags__name__icontains=query)
         ).distinct()
+
+        return self._apply_sort(filtered)
+
+    def _apply_sort(self, queryset):
+        sort = (self.request.query_params.get('sort') or '').strip().lower()
+        if sort == 'most_requested':
+            return queryset.order_by('-leads_count', '-created_at')
+        return queryset.order_by('-created_at')
 
     def perform_create(self, serializer):
         if self.request.user.role != 'founder':
