@@ -1,0 +1,24 @@
+{
+  "name": "startup-marketplace",
+  "version": "1.0.0",
+  "description": "A B2B SaaS marketplace that helps early-stage startups get their first customers by solving the trust gap through problem-based discovery and lead generation.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://Riteshbidve@github.com/Riteshbidve/startup-marketplace.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Riteshbidve/startup-marketplace/issues"
+  },
+  "homepage": "https://github.com/Riteshbidve/startup-marketplace#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.61.0"
+  }
+}
