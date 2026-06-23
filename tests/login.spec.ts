@@ -1,0 +1,18 @@
+import { test, expect } from '@playwright/test';
+import { LoginPage } from '../page/loginpage';
+
+test('Login Success', async ({ page }) => {
+
+  const login = new LoginPage(page);
+
+  await login.goto();
+
+  await login.login(
+    'founder1',
+    'password123'
+  );
+
+  await expect(page)
+    .toHaveURL(/products/);
+
+});
