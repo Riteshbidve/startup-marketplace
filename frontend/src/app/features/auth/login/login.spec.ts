@@ -38,7 +38,13 @@ describe('Login Component', () => {
           },
         },
       ],
-    }).compileComponents();
+    })
+      .overrideComponent(Login, {
+        set: {
+          template: '',
+        },
+      })
+      .compileComponents();
 
     fixture = TestBed.createComponent(Login);
     component = fixture.componentInstance;
