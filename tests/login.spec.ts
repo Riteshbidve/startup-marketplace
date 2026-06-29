@@ -8,8 +8,8 @@ test('Login Success', async ({ page }) => {
   await login.goto();
 
   await login.login(
-    'founder1',
-    'password123'
+    'auth_test_founder',
+    'StrongPass123'
   );
 
   await expect(page)

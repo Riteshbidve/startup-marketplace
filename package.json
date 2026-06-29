@@ -3,7 +3,19 @@
   "version": "1.0.0",
   "description": "A B2B SaaS marketplace that helps early-stage startups get their first customers by solving the trust gap through problem-based discovery and lead generation.",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "scripts": {
+  "test": "playwright test",
+
+  "test:headed": "playwright test --headed",
+
+  "test:debug": "playwright test --debug",
+
+  "report": "playwright show-report",
+
+  "codegen": "playwright codegen http://127.0.0.1:4200"
+  }
+  },
   "repository": {
     "type": "git",
     "url": "git+https://Riteshbidve@github.com/Riteshbidve/startup-marketplace.git"
